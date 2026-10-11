@@ -16,6 +16,24 @@ on:
     - cron: "0 7 * * *" # Catch breakage from upstream Verus `main`
 
 jobs:
+  tla:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install pinned TLA+ tools
+        run: tools/setup-tla-linux.sh
+
+      - name: Verify TLA+ proofs and finite models
+        run: |
+          export TLA_TOOLS_JAR="$GITHUB_WORKSPACE/.tla-tools/tla2tools.jar"
+          export TLAPM_BIN="$GITHUB_WORKSPACE/.tla-tools/tlapm/bin/tlapm"
+          tools/verify-tla.sh
+
+      - name: Check source coverage inventory
+        run: python3 tools/check-tla-coverage.py
+
   verify:
     runs-on: ubuntu-24.04
     steps:
