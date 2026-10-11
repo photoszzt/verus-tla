@@ -401,11 +401,32 @@ THEOREM LeadsToShortcutAt ==
            \E j \in Nat : Suffix(ex, i + j) \in Or(R, U)
   BY SMT, NatAddAssoc, NatAddZero DEF Or
 
+THEOREM LeadsToShortcutMember ==
+  ASSUME NEW ex \in Executions,
+         NEW P \in SUBSET Executions,
+         NEW Q \in SUBSET Executions,
+         NEW R \in SUBSET Executions,
+         NEW U \in SUBSET Executions,
+         ex \in LeadsTo(P, Or(Q, U)),
+         ex \in LeadsTo(Q, Or(R, U))
+  PROVE  ex \in LeadsTo(P, Or(R, U))
+PROOF
+  <1>1. \A i \in Nat : Suffix(ex, i) \in P =>
+           \E j \in Nat : Suffix(ex, i + j) \in Or(Q, U)
+    BY SMT, LeadsToCharacterization, OrType
+  <1>2. \A i \in Nat : Suffix(ex, i) \in Q =>
+           \E j \in Nat : Suffix(ex, i + j) \in Or(R, U)
+    BY SMT, LeadsToCharacterization, OrType
+  <1>3. \A i \in Nat : Suffix(ex, i) \in P =>
+           \E j \in Nat : Suffix(ex, i + j) \in Or(R, U)
+    BY SMT, NatAddAssoc, NatAddZero, <1>1, <1>2 DEF Or
+  <1>4. QED BY SMT, LeadsToCharacterization, OrType, <1>3
+
 THEOREM LeadsToShortcut ==
   \A P, Q, R, U \in SUBSET Executions :
     Entails(And(LeadsTo(P, Or(Q, U)), LeadsTo(Q, Or(R, U))),
             LeadsTo(P, Or(R, U)))
-  BY SMT, LeadsToCharacterization, LeadsToShortcutAt, OrType, LeadsToType
+  BY SMT, LeadsToShortcutMember, OrType, LeadsToType
     DEF Entails, And
 
 THEOREM EventuallyAlwaysAndAt ==
