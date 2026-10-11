@@ -83,4 +83,12 @@ THEOREM StableAnd ==
   ((p => []p) /\ (q => []q)) => ((p /\ q) => [](p /\ q))
   BY PTL
 
+THEOREM NativeInvariantInduction ==
+  (p /\ [](p => p')) => []p
+  BY PTL
+
+THEOREM NativeLeadsToStable ==
+  ((p ~> q) /\ [](q => q')) => (p ~> []q)
+  BY PTL
+
 ==========================================================================

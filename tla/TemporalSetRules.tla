@@ -706,6 +706,154 @@ THEOREM TrueLeadsToEventuallyAlwaysEquality ==
   BY SMT, TrueLeadsToEqualsAlwaysEventually,
     AlwaysEventuallyAlwaysEquality, AlwaysType DEF Entails
 
+THEOREM StrengthenAlways ==
+  \A S, P, Q, R \in SUBSET Executions :
+    (Entails(S, Always(P)) /\ Entails(S, Always(Q)) /\
+     Entails(And(P, Q), R)) => Entails(S, Always(R))
+  BY SMT, AlwaysAnd, EntailsPreservedByAlways, AndType
+    DEF Entails, And
+
+THEOREM StrengthenNext ==
+  \A S \in SUBSET Executions :
+  \A A, B \in SUBSET (States \X States) :
+  \A I \in SUBSET States :
+    (Entails(S, Always(LiftAction(A))) /\
+     Entails(S, Always(LiftState(I))) /\
+     Entails(LiftAction(B), And(LiftAction(A), LiftState(I))) /\
+     Entails(And(LiftAction(A), LiftState(I)), LiftAction(B))) =>
+      Entails(S, Always(LiftAction(B)))
+  BY SMT, StrengthenAlways DEF Entails, LiftAction, LiftState, And
+
+THEOREM StableExists ==
+  \A D, F : F \in [D -> SUBSET Executions] =>
+    (\A a \in D : Valid(Stable(F[a]))) => Valid(Stable(Exists(D, F)))
+  BY SMT, SuffixType DEF Valid, Stable, Implies, Always, Exists
+
+THEOREM StableGoalsCombine ==
+  ASSUME NEW S \in SUBSET Executions,
+         NEW P \in SUBSET Executions,
+         NEW Q \in SUBSET Executions,
+         NEW R \in SUBSET Executions,
+         Valid(Stable(Q)),
+         Valid(Stable(R)),
+         Entails(S, LeadsTo(P, Q)),
+         Entails(S, LeadsTo(P, R))
+  PROVE  Entails(S, LeadsTo(P, And(Q, R)))
+PROOF
+  <1>1. Q = Always(Q) /\ R = Always(R)
+    BY SMT, StableToAlways
+  <1>2. Entails(S, LeadsTo(P, Always(And(Q, R))))
+    BY SMT, LeadsToAlwaysAnd, <1>1
+  <1>3. QED BY SMT, LeadsToEliminateAlways, <1>2, AndType
+    DEF Entails
+
+THEOREM ExistsAlwaysStable ==
+  ASSUME NEW D,
+         NEW F \in [D -> SUBSET Executions]
+  PROVE  Valid(Stable(Exists(D, [a \in D |-> Always(F[a])])))
+PROOF
+  <1>1. [a \in D |-> Always(F[a])] \in [D -> SUBSET Executions]
+    BY SMT, AlwaysType
+  <1>2. \A a \in D : Valid(Stable(Always(F[a])))
+    BY SMT, AlwaysPIsStable
+  <1>3. QED BY SMT, StableExists, <1>1, <1>2
+
+THEOREM ExistsAlwaysAndEquality ==
+  \A D, F, R : (F \in [D -> SUBSET Executions] /\ R \subseteq Executions) =>
+    Exists(D, [a \in D |-> Always(And(F[a], R))]) =
+      And(Exists(D, [a \in D |-> Always(F[a])]), Always(R))
+  BY SMT, AlwaysAnd, ExistsAnd, AlwaysType, AndType
+    DEF Exists, And
+
+THEOREM LeadsToExistsAlwaysAnd ==
+  ASSUME NEW D,
+         NEW F \in [D -> SUBSET Executions],
+         NEW S \in SUBSET Executions,
+         NEW P \in SUBSET Executions,
+         NEW R \in SUBSET Executions,
+         Entails(S, LeadsTo(P, Exists(D, [a \in D |-> Always(F[a])]))),
+         Entails(S, LeadsTo(P, Always(R)))
+  PROVE
+    /\ Entails(S, LeadsTo(P,
+         Exists(D, [a \in D |-> Always(And(F[a], R))])))
+    /\ Entails(S, LeadsTo(P,
+         Exists(D, [a \in D |-> And(Always(F[a]), Always(R))])))
+    /\ Entails(S, LeadsTo(P,
+         And(Exists(D, [a \in D |-> Always(F[a])]), Always(R))))
+PROOF
+  <1>1. DEFINE E == Exists(D, [a \in D |-> Always(F[a])])
+  <1>2. E \in SUBSET Executions
+    BY SMT, AlwaysType DEF E, Exists
+  <1>3. Valid(Stable(E)) /\ Valid(Stable(Always(R)))
+    BY SMT, ExistsAlwaysStable, AlwaysPIsStable DEF E
+  <1>4. E = Always(E) /\ Always(R) = Always(Always(R))
+    BY SMT, StableToAlways, AlwaysType, <1>2, <1>3
+      DEF E, Valid, Stable
+  <1>5. Entails(S, LeadsTo(P, Always(And(E, Always(R)))))
+    BY SMT, LeadsToAlwaysAnd, AlwaysType, <1>2, <1>4
+      DEF E, Entails, And, LeadsTo
+  <1>6. Entails(S, LeadsTo(P, And(E, Always(R))))
+    BY SMT, LeadsToEliminateAlways, <1>2, <1>5
+      DEF Entails, And
+  <1>7. Exists(D, [a \in D |-> Always(And(F[a], R))]) =
+         And(E, Always(R))
+    BY SMT, ExistsAlwaysAndEquality DEF E
+  <1>8. Exists(D, [a \in D |-> And(Always(F[a]), Always(R))]) =
+         And(E, Always(R))
+    BY SMT, ExistsAnd, AlwaysType DEF E
+  <1>9. QED BY SMT, <1>6, <1>7, <1>8 DEF E
+
+THEOREM PairInProduct ==
+  \A D, G : \A a \in D : \A b \in G : <<a, b>> \in D \X G
+  BY SMT
+
+THEOREM ExistsProductAndAt ==
+  \A D, G, F, H, ex :
+    (F \in [D -> SUBSET Executions] /\
+     H \in [G -> SUBSET Executions] /\ ex \in Executions) =>
+      (ex \in Exists(D \X G,
+        [ab \in D \X G |-> And(F[ab[1]], H[ab[2]])]) <=>
+       ex \in And(Exists(D, F), Exists(G, H)))
+  BY SMT, PairInProduct DEF Exists, And
+
+THEOREM ExistsProductAnd ==
+  \A D, G, F, H :
+    (F \in [D -> SUBSET Executions] /\
+     H \in [G -> SUBSET Executions]) =>
+      Exists(D \X G, [ab \in D \X G |-> And(F[ab[1]], H[ab[2]])]) =
+        And(Exists(D, F), Exists(G, H))
+  BY SMT, ExistsProductAndAt, SetExtensionality DEF Exists, And
+
+THEOREM LeadsToExistsAlwaysAndExists ==
+  ASSUME NEW D, NEW G,
+         NEW F \in [D -> SUBSET Executions],
+         NEW H \in [G -> SUBSET Executions],
+         NEW S \in SUBSET Executions,
+         NEW P \in SUBSET Executions,
+         Entails(S, LeadsTo(P, Exists(D, [a \in D |-> Always(F[a])]))),
+         Entails(S, LeadsTo(P, Exists(G, [b \in G |-> Always(H[b])])))
+  PROVE Entails(S, LeadsTo(P,
+    Exists(D \X G, [ab \in D \X G |->
+      And(Always(F[ab[1]]), Always(H[ab[2]]))])))
+PROOF
+  <1>1. DEFINE E1 == Exists(D, [a \in D |-> Always(F[a])])
+  <1>2. DEFINE E2 == Exists(G, [b \in G |-> Always(H[b])])
+  <1>3. E1 \in SUBSET Executions /\ E2 \in SUBSET Executions
+    BY SMT, AlwaysType DEF E1, E2, Exists
+  <1>4. Valid(Stable(E1)) /\ Valid(Stable(E2))
+    BY SMT, ExistsAlwaysStable DEF E1, E2
+  <1>5. E1 = Always(E1) /\ E2 = Always(E2)
+    BY SMT, StableToAlways, <1>3, <1>4 DEF E1, E2, Valid, Stable
+  <1>6. Entails(S, LeadsTo(P, Always(And(E1, E2))))
+    BY SMT, LeadsToAlwaysAnd, <1>3, <1>5
+      DEF E1, E2, Entails, And, LeadsTo
+  <1>7. Entails(S, LeadsTo(P, And(E1, E2)))
+    BY SMT, LeadsToEliminateAlways, <1>3, <1>6
+      DEF Entails, And
+  <1>8. Exists(D \X G, [ab \in D \X G |->
+           And(Always(F[ab[1]]), Always(H[ab[2]]))]) = And(E1, E2)
+    BY SMT, ExistsProductAnd, AlwaysType DEF E1, E2
+  <1>9. QED BY SMT, <1>7, <1>8 DEF E1, E2
 
 
 
