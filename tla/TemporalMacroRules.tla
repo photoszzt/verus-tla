@@ -13,6 +13,10 @@ THEOREM ConjoinType ==
   \A C : Conjoin(C) \subseteq Executions
   BY DEF Conjoin
 
+THEOREM ConjoinEmpty ==
+  Conjoin({}) = Executions
+  BY SMT DEF Conjoin
+
 THEOREM ConjoinPair ==
   \A P, Q \in SUBSET Executions : Conjoin({P, Q}) = And(P, Q)
   BY SMT DEF Conjoin, And
@@ -137,6 +141,19 @@ THEOREM MergedActionAt ==
     (<<s, t>> \in MergedAction(A, C) <=>
      (<<s, t>> \in A /\ \A I \in C : s \in I))
   BY SMT DEF MergedAction
+
+THEOREM MergedActionEmpty ==
+  \A A \in SUBSET (States \X States) : MergedAction(A, {}) = A
+  BY SMT, SetExtensionality DEF MergedAction
+
+THEOREM MergedActionAdd ==
+  \A A \in SUBSET (States \X States) :
+  \A C \in SUBSET (SUBSET States) :
+  \A I \in SUBSET States :
+    MergedAction(A, C \cup {I}) =
+      {pair \in States \X States :
+        pair \in MergedAction(A, C) /\ pair[1] \in I}
+  BY SMT, SetExtensionality DEF MergedAction
 
 THEOREM HeadsType ==
   \A ex \in Executions :

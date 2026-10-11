@@ -27,11 +27,21 @@ proves its exact temporal lifting.
 | `or_leads_to_combine_and_equality` | `OrLeadsToNamedResult` |
 | `merge_into_next`, `merge_into_next_internal` | `MergedActionAt`, `LiftMergedAction` |
 
-Each theorem quantifies over an arbitrary family of predicates. The pair/add
-equations support recursive expansion for conjunction and disjunction.
-**The correspondence remains open:** no TLAPM theorem yet equates an arbitrary
-ordered Rust-style fold with `Conjoin(C)` or `Disjoin(C)`. The coverage ledger
-therefore keeps these macro rows open despite the checked result theorems.
+Each theorem quantifies over an arbitrary family of predicates.
+`TemporalFoldRules.tla` proves the missing ordered-fold bridge for every
+finite sequence of arguments. `FoldAndTraceCorrespondence` and
+`FoldOrTraceCorrespondence` equate any trace satisfying the macro's recursive
+conjunction or disjunction equations with `Conjoin` or `Disjoin` of the
+sequence prefix. `MergedActionTraceCorrespondence` does the same for the
+source-state tests in `merge_into_next`. The checked `AndTraceRecurrence`,
+`OrTraceRecurrence`, and `ActionTraceRecurrence` construct traces satisfying
+those equations, including the empty-list case. Thus the result theorems in
+the table apply at the last trace position for arbitrary finite argument
+lists, with order and duplicates preserved by the trace and erased only by
+the proved set-family equivalence. `AndFoldResult`, `OrFoldResult`, and
+`MergedActionFoldResult` state these last-position results explicitly. Six
+proof-script macros remain open; they
+need separate finite chaining or persistent-conjunction arguments.
 The exact `TempPred` interpretation is the set of executions from
 `TemporalPredicates.tla`. These are proof schemata for macro results, not
 claims that the TLA+ checker parses or executes Rust macro syntax.
