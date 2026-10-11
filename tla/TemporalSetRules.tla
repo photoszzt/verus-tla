@@ -817,12 +817,19 @@ THEOREM ExistsProductAndAt ==
   BY SMT, PairInProduct DEF Exists, And
 
 THEOREM ExistsProductAnd ==
-  \A D, G, F, H :
-    (F \in [D -> SUBSET Executions] /\
-     H \in [G -> SUBSET Executions]) =>
-      Exists(D \X G, [ab \in D \X G |-> And(F[ab[1]], H[ab[2]])]) =
+  ASSUME NEW D, NEW G,
+         NEW F \in [D -> SUBSET Executions],
+         NEW H \in [G -> SUBSET Executions]
+  PROVE Exists(D \X G,
+          [ab \in D \X G |-> And(F[ab[1]], H[ab[2]])]) =
         And(Exists(D, F), Exists(G, H))
-  BY SMT, ExistsProductAndAt, SetExtensionality DEF Exists, And
+PROOF
+  <1>1. \A ex \in Executions :
+    (ex \in Exists(D \X G,
+      [ab \in D \X G |-> And(F[ab[1]], H[ab[2]])]) <=>
+     ex \in And(Exists(D, F), Exists(G, H)))
+    BY SMT, ExistsProductAndAt
+  <1>2. QED BY SMT, <1>1, SetExtensionality DEF Exists, And
 
 THEOREM LeadsToExistsAlwaysAndExists ==
   ASSUME NEW D, NEW G,
