@@ -51,6 +51,11 @@ definitions, generic action and machine formulations, native temporal laws,
 and a finite two-thread mutex model. [`tla/coverage.csv`](tla/coverage.csv)
 tracks every public source rule, exported macro, definition, and formulation.
 An `open` or `defined` row is **not** a checked generic correspondence.
+[`tla/TemporalMacroRules.tla`](tla/TemporalMacroRules.tla) proves generic
+finite-family results used by conjunction and disjunction macros.
+[`tla/TemporalFoldRules.tla`](tla/TemporalFoldRules.tla) proves their finite
+ordered-fold correspondence. [`tla/MacroCorrespondence.md`](tla/MacroCorrespondence.md)
+maps the checked macro schemata and the remaining proof-script macros.
 
 The exact image treats a temporal predicate as a set of infinite behaviors and
 defines `Later(P)` by applying `P` to the behavior's suffix at index one. The
