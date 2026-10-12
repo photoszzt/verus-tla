@@ -12,13 +12,13 @@ The largest open proof groups are:
    weak fairness versus native `WF_vars`, enabledness, and stuttering.
 2. Arbitrary temporal `Later`, finite-domain quantifier convergence,
    natural-number rank induction, and ESR recursion.
-3. The exact invariant-preservation and WF1 rules tied to `Next`.
+3. WF1 rules tied to `Next`, including enabledness and fairness correspondence.
 4. Exact behavior-set closures of the remaining leads-to combinations and
-   quantified stability rules.
-5. Macro expansion laws and the source-level definition correspondence.
+   finite-domain quantifier rules.
+5. Source-level definition correspondence for the macro result schemata.
 
-The local proof command is
-`cd tla && "$TLAPM_BIN" TemporalSetRules.tla`.
+The local check command is `tools/verify-tla.sh` with the pinned tool paths
+described in the README.
 
 Pull requests run the checked proof modules and finite models, then validate
 the source inventory with

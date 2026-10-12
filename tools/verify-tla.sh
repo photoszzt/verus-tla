@@ -16,6 +16,8 @@ done
 "$TLAPM_BIN" TemporalSetRules.tla
 "$TLAPM_BIN" TemporalMacroRules.tla
 "$TLAPM_BIN" TemporalFoldRules.tla
+"$TLAPM_BIN" TemporalMacroChainRules.tla
+"$TLAPM_BIN" TemporalActionRules.tla
 
 java -XX:+UseParallelGC -cp "$TLA_TOOLS_JAR" tlc2.TLC \
   -workers 1 -deadlock -config GenericMachineModel.cfg GenericMachineModel.tla

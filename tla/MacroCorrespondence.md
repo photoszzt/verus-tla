@@ -26,8 +26,11 @@ proves its exact temporal lifting.
 | `or_leads_to_n`, `or_leads_to_n_internal` | `OrLeadsToFamily` |
 | `or_leads_to_combine_and_equality` | `OrLeadsToNamedResult` |
 | `merge_into_next`, `merge_into_next_internal` | `MergedActionAt`, `LiftMergedAction` |
+| `entails_trans_n`, `entails_trans_n_internal` | `EntailsFiniteChain` |
+| `leads_to_trans_n`, `leads_to_trans_n_internal` | `LeadsToFiniteChain` |
+| `leads_to_always_and_n`, `leads_to_always_and_n_internal` | `LeadsToAlwaysFiniteConjoin` |
 
-Each theorem quantifies over an arbitrary family of predicates.
+The set-family result theorems quantify over arbitrary sets of predicates.
 `TemporalFoldRules.tla` proves the missing ordered-fold bridge for every
 finite sequence of arguments. `FoldAndTraceCorrespondence` and
 `FoldOrTraceCorrespondence` equate any trace satisfying the macro's recursive
@@ -39,9 +42,12 @@ those equations, including the empty-list case. Thus the result theorems in
 the table apply at the last trace position for arbitrary finite argument
 lists, with order and duplicates preserved by the trace and erased only by
 the proved set-family equivalence. `AndFoldResult`, `OrFoldResult`, and
-`MergedActionFoldResult` state these last-position results explicitly. Six
-proof-script macros remain open; they
-need separate finite chaining or persistent-conjunction arguments.
+`MergedActionFoldResult` state these last-position results explicitly.
+`TemporalMacroChainRules.tla` proves the remaining proof-script macro
+schemas by natural-number induction. The two transitivity macros use every
+adjacent premise in a sequence of at least three predicates; the persistent
+conjunction macro uses every per-argument leads-to premise in a sequence of
+at least two predicates. These are the source macros' minimum arities.
 The exact `TempPred` interpretation is the set of executions from
 `TemporalPredicates.tla`. These are proof schemata for macro results, not
 claims that the TLA+ checker parses or executes Rust macro syntax.
