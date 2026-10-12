@@ -11,7 +11,7 @@ The largest open proof groups are:
 1. Generic state/action and behavior-to-native bridges, especially raw Verus
    weak fairness versus native `WF_vars`, enabledness, and stuttering.
 2. Arbitrary temporal `Later`, finite-domain quantifier convergence,
-   natural-number rank induction, and ESR recursion.
+   and ESR recursion.
 3. WF1 rules tied to `Next`, including enabledness and fairness correspondence.
 4. Exact behavior-set closures of the remaining leads-to combinations and
    finite-domain quantifier rules.
