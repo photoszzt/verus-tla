@@ -15,7 +15,7 @@ The largest open proof groups are:
 3. The exact invariant-preservation and WF1 rules tied to `Next`.
 4. Exact behavior-set closures of the remaining leads-to combinations and
    quantified stability rules.
-5. Macro expansion laws and the source-level definition correspondence.
+5. Source-level definition correspondence for the macro result schemata.
 
 The local proof command is
 `cd tla && "$TLAPM_BIN" TemporalSetRules.tla`.
