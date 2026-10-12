@@ -1,2 +1,7 @@
 /target
 Cargo.lock
+/tla/.tlacache/
+/tla/states/
+/tla/*_TTrace_*.tla
+/tla/*_TTrace_*.bin
+/.tla-tools/
