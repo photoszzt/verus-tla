@@ -57,6 +57,9 @@ finite-family results used by conjunction and disjunction macros.
 ordered-fold correspondence. [`tla/TemporalMacroChainRules.tla`](tla/TemporalMacroChainRules.tla)
 proves the finite proof-script chains. [`tla/MacroCorrespondence.md`](tla/MacroCorrespondence.md)
 maps all checked macro schemata.
+[`tla/TemporalActionRules.tla`](tla/TemporalActionRules.tla) proves action
+preservation, initialization, and two stable leads-to rules. It also proves
+the identity-step case used when interpreting native `[Next]_vars`.
 
 The exact image treats a temporal predicate as a set of infinite behaviors and
 defines `Later(P)` by applying `P` to the behavior's suffix at index one. The
