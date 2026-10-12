@@ -54,8 +54,9 @@ An `open` or `defined` row is **not** a checked generic correspondence.
 [`tla/TemporalMacroRules.tla`](tla/TemporalMacroRules.tla) proves generic
 finite-family results used by conjunction and disjunction macros.
 [`tla/TemporalFoldRules.tla`](tla/TemporalFoldRules.tla) proves their finite
-ordered-fold correspondence. [`tla/MacroCorrespondence.md`](tla/MacroCorrespondence.md)
-maps the checked macro schemata and the remaining proof-script macros.
+ordered-fold correspondence. [`tla/TemporalMacroChainRules.tla`](tla/TemporalMacroChainRules.tla)
+proves the finite proof-script chains. [`tla/MacroCorrespondence.md`](tla/MacroCorrespondence.md)
+maps all checked macro schemata.
 
 The exact image treats a temporal predicate as a set of infinite behaviors and
 defines `Later(P)` by applying `P` to the behavior's suffix at index one. The
