@@ -6,6 +6,12 @@ IdentityAction == {<<s, s>> : s \in States}
 StutteringClosure(A) == A \cup IdentityAction
 LiftFamily(D, F) == [a \in D |-> LiftState(F[a])]
 PersistentFamily(D, F) == [a \in D |-> Always(LiftState(F[a]))]
+DownwardStates(F, n) ==
+  {s \in States : \E m \in 0 .. n : s \in F[m]}
+BoundedWitness(F, n) ==
+  Exists(Nat,
+    [m \in Nat |->
+      And(LiftState({s \in States : m <= n}), LiftState(F[m]))])
 
 THEOREM NatInductionChecked ==
   ASSUME NEW P(_), P(0), \A n \in Nat : P(n) => P(n + 1)
@@ -257,4 +263,87 @@ PROOF
     BY SMT, SuffixType DEF Entails, Always, Implies
   <1>6. QED BY SMT, <1>3, <1>4, <1>5, LeadsToWeaken
     DEF Q, R
+
+THEOREM DownwardStatesPreserved ==
+  ASSUME NEW A \in SUBSET (States \X States),
+         NEW F \in [Nat -> SUBSET States],
+         \A m \in Nat : \A s, t \in States :
+           (<<s, t>> \in A /\ s \in F[m]) =>
+             (\E k \in 0 .. m : t \in F[k])
+  PROVE \A n \in Nat : \A s, t \in States :
+    (<<s, t>> \in A /\ s \in DownwardStates(F, n)) =>
+      t \in DownwardStates(F, n)
+  BY SMT DEF DownwardStates
+
+THEOREM NextMonotonicToAlwaysExists ==
+  ASSUME NEW A \in SUBSET (States \X States),
+         NEW F \in [Nat -> SUBSET States],
+         NEW S \in SUBSET Executions,
+         \A m \in Nat : \A s, t \in States :
+           (<<s, t>> \in A /\ s \in F[m]) =>
+             (\E k \in 0 .. m : t \in F[k]),
+         Entails(S, Always(LiftAction(A)))
+  PROVE \A n \in Nat :
+    Entails(S, Always(Implies(LiftState(F[n]),
+      Always(LiftState(DownwardStates(F, n))))))
+PROOF
+  <1>1. \A n \in Nat : F[n] \subseteq DownwardStates(F, n)
+    BY SMT DEF DownwardStates
+  <1>2. \A n \in Nat : \A s, t \in States :
+    (<<s, t>> \in A /\ s \in DownwardStates(F, n)) =>
+      t \in DownwardStates(F, n)
+    BY DownwardStatesPreserved
+  <1>3. ASSUME NEW n \in Nat, NEW ex \in S
+        PROVE ex \in Always(Implies(LiftState(F[n]),
+          Always(LiftState(DownwardStates(F, n)))))
+  PROOF
+    <2>1. ex \in Executions /\ ex \in Always(LiftAction(A))
+      BY SMT DEF Entails
+    <2>2. \A i \in Nat :
+      Suffix(ex, i) \in Implies(LiftState(F[n]),
+        Always(LiftState(DownwardStates(F, n))))
+    PROOF
+      <3>1. ASSUME NEW i \in Nat
+            PROVE Suffix(ex, i) \in Implies(LiftState(F[n]),
+              Always(LiftState(DownwardStates(F, n))))
+      PROOF
+        <4>1. Suffix(ex, i) \in Executions /\
+              Suffix(ex, i) \in Always(LiftAction(A))
+          BY SMT, <2>1, SuffixType, AlwaysSuffix
+        <4>2. Suffix(ex, i) \in LiftState(F[n]) =>
+              Suffix(ex, i) \in LiftState(DownwardStates(F, n))
+          BY SMT, <1>1, <4>1 DEF LiftState
+        <4>3. DownwardStates(F, n) \in SUBSET States
+          BY DEF DownwardStates
+        <4>4. ASSUME Suffix(ex, i) \in LiftState(DownwardStates(F, n))
+              PROVE Suffix(ex, i) \in
+                Always(LiftState(DownwardStates(F, n)))
+        PROOF
+          <5>1. \A j \in Nat :
+            Suffix(Suffix(ex, i), j) \in LiftState(DownwardStates(F, n))
+            BY SMT, <1>2, <4>1, <4>3, <4>4, NextToStableAt
+          <5>2. QED BY SMT, <4>1, <5>1 DEF Always
+        <4>5. QED BY SMT, <4>1, <4>2, <4>4 DEF Implies
+      <3>2. QED BY <3>1
+    <2>3. QED BY SMT, <2>1, <2>2 DEF Always, Implies
+  <1>4. QED BY SMT, <1>3 DEF Entails
+
+THEOREM DownwardLiftCorrespondence ==
+  \A F \in [Nat -> SUBSET States] : \A n \in Nat :
+    LiftState(DownwardStates(F, n)) = BoundedWitness(F, n)
+  BY SMT, SetExtensionality
+    DEF DownwardStates, BoundedWitness, Exists, LiftState, And
+
+THEOREM NextMonotonicSourceForm ==
+  ASSUME NEW A \in SUBSET (States \X States),
+         NEW F \in [Nat -> SUBSET States],
+         NEW S \in SUBSET Executions,
+         \A m \in Nat : \A s, t \in States :
+           (<<s, t>> \in A /\ s \in F[m]) =>
+             (\E k \in 0 .. m : t \in F[k]),
+         Entails(S, Always(LiftAction(A)))
+  PROVE \A n \in Nat :
+    Entails(S, Always(Implies(LiftState(F[n]),
+      Always(BoundedWitness(F, n)))))
+  BY SMT, NextMonotonicToAlwaysExists, DownwardLiftCorrespondence
 ===========================================================================

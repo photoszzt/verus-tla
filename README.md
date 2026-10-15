@@ -60,6 +60,8 @@ maps all checked macro schemata.
 [`tla/TemporalActionRules.tla`](tla/TemporalActionRules.tla) proves action
 preservation, initialization, and two stable leads-to rules. It also proves
 the identity-step case used when interpreting native `[Next]_vars`.
+[`tla/TemporalRankRules.tla`](tla/TemporalRankRules.tla) proves finite
+ascending leads-to chains and decreasing-rank induction.
 
 The exact image treats a temporal predicate as a set of infinite behaviors and
 defines `Later(P)` by applying `P` to the behavior's suffix at index one. The

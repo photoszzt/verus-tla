@@ -22,3 +22,12 @@ and `[](Q /\ N => Later(Q))`, a behavior satisfying `Q` satisfies `[]Q`.
 `ActionPreservesExistsAt` holds an existential witness fixed while its state
 predicate is preserved. It supports both `EntailsExistsStable` and
 `LeadsToExistsStable` for an arbitrary witness domain `D`.
+
+`DownwardStates(F, n)` is the set of states satisfying some `F[m]` with
+`m <= n`. `DownwardStatesPreserved` uses the source rule's monotone-step
+premise to show that this set is invariant under the action.
+`NextMonotonicToAlwaysExists` then proves the source conclusion for every
+natural rank `n`: at every behavior suffix, `F[n]` implies that a witness
+rank at most `n` remains present forever. `DownwardLiftCorrespondence`
+checks equality with the source's explicit `tla_exists` expression, and
+`NextMonotonicSourceForm` states the resulting source-shaped theorem.
